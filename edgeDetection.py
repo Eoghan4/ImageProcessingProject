@@ -71,9 +71,6 @@ for distance, angle, line in sorted_lines:
     x1, y1, x2, y2 = line
     print(f"Line from ({x1}, {y1}) to ({x2}, {y2}) with distance {distance:.2f}")
 
-MIDPOINT_THRESHOLD = 25  
-ANGLE_THRESHOLD = 0.2
-
 close_lines = sorted_lines[:10]  # Get the closest lines to the center
 
 #sorting lines from longest to shortest
@@ -82,16 +79,54 @@ if linesP is not None:
     for distance, angle, line in close_lines:
         x1, y1, x2, y2 = line
         length = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-        lengths.append((length, line))
+        lengths.append((length,angle, line))
 
     lengths.sort(key=lambda x: x[0], reverse=True)
 
     print("Lines sorted by length:(duplicates included)")
-    for length, line in lengths:
+    for length, angle, line in lengths:
         x1, y1, x2, y2 = line
         print(f"Line from ({x1}, {y1}) to ({x2}, {y2}) with length {length:.2f}")
 
+for length, angle, line in lengths:
+    print(f"Checking line from {line} with angle {angle:.2f} and length {length:.2f}") # displays the angle and length of each line for debugging purposes
+    
+ANGLE_THRESHOLD = 0.2
 
+unique_lines = []
+#merges lines that are very similar in angle to avoid duplicates, and also removes one side of the clock hand keeping the longest line making it easier to find the angle of the clock hand
+for length, angle, line in lengths:
+
+    is_duplicate = False
+
+    for kept_length, kept_angle, kept_line in unique_lines:
+
+        # Difference between angles
+        angle_difference = abs(angle - kept_angle)
+
+        if (angle_difference < ANGLE_THRESHOLD):
+            is_duplicate = True
+            break
+
+    if not is_duplicate:
+        unique_lines.append(
+            (length, angle, line)
+        )
+
+print("Unique lines after filtering")
+if unique_lines is not None:
+    for length, angle, line in unique_lines:
+        x1, y1, x2, y2 = line
+        print(f"Line from ({x1}, {y1}) to ({x2}, {y2})")
+        cv2.line(BINARY_BGR, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 3, cv2.LINE_AA)
+
+hour_hand = unique_lines[1][2]  # Get the line coordinates for the hour hand
+minute_hand = unique_lines[0][2]  # Get the line coordinates for the minute hand
+
+hour_hand_x1, hour_hand_y1, hour_hand_x2, hour_hand_y2 = hour_hand
+minute_hand_x1, minute_hand_y1, minute_hand_x2, minute_hand_y2 = minute_hand
+print(f"Hour hand line: {hour_hand_x1}, {hour_hand_y1}, {hour_hand_x2}, {hour_hand_y2}")
+print(f"Minute hand line: {minute_hand_x1}, {minute_hand_y1}, {minute_hand_x2}, {minute_hand_y2}")
 
 # Show results using defined variable
 cv2.imshow("Source Original", ORIGINAL)
