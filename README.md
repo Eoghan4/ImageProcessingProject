@@ -8,6 +8,7 @@ Get the image in the best possible state in order to extract the location of the
 
 ## Task 2: Hand Detection (Jack)
 Locate where the clock hands are in the pre-processed image, then determine the co-ordinates of the start and end points as well as which hand is the hour hand and which is the minute hand to provide to Daniel - **edgeDetection.py**
+
 Eoghan also added **handDetection.py** to build off the bulk of Jacks edge detection work, filtering for the minute and hour hands, and tidying the output for Daniel.
 
 ## Task 3: Time Calculation (Daniel)
